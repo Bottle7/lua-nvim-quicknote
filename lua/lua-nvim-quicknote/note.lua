@@ -10,6 +10,14 @@ local config = {
 
 local config_file = fn.stdpath('config') .. '/quicknote_config.json'
 
+local function expand_path(path)
+  if path:sub(1,1) == '~' then
+    local home = os.getenv("HOME") or os.getenv("USERPROFILE")
+    return home .. path:sub(2)
+  end
+  return path
+end
+
 local function save_config()
   local json = fn.json_encode(config)
   fn.writefile({json}, config_file)
@@ -35,6 +43,7 @@ end
 function M.setup(user_config)
   load_config()
   config = vim.tbl_deep_extend("force", config, user_config or {})
+  config.notes_dir = expand_path(config.notes_dir)
   fn.mkdir(config.notes_dir, 'p')
   save_config()
 end
