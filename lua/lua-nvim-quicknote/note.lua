@@ -41,7 +41,7 @@ end
 function M.save_note(buf)
   buf = buf or api.nvim_get_current_buf()
   local lines = api.nvim_buf_get_lines(buf, 0, -1, false)
-  local filename = get_title_as_filename()
+  local filename = get_title_as_filename() .. ".md"
   local filepath = fn.resolve(config.notes_dir .. '/' .. filename)
   fn.writefile(lines, filepath)
   print('Note saved: ' .. filepath)
