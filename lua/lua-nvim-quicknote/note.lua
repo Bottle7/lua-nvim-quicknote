@@ -8,15 +8,35 @@ local config = {
   notes_dir = fn.expand('~/notes'),
 }
 
-local function get_title_as_filename()
-    local first_line = fn.getline(1)
-    local sanitized_title = first_line:gsub("%s+", "_"):gsub("[^%w_]", "")
-    return sanitized_title:sub(1, 30) -- Limit to 30 characters
+local config_file = fn.stdpath('config') .. '/quicknote_config.json'
+
+local function save_config()
+  local json = fn.json_encode(config)
+  fn.writefile({json}, config_file)
+end
+
+local function load_config()
+  if fn.filereadable(config_file) == 1 then
+    local json = fn.readfile(config_file)[1]
+    local loaded_config = fn.json_decode(json)
+    if type(loaded_config) == 'table' then
+      config = vim.tbl_deep_extend("force", config, loaded_config)
+    end
+  end
+end
+
+local function sanitize_filename(name)
+  name = name.gsub('[^%w%s-]', '_')
+  name = name:gsub('%s+', '_')
+  name = name:gsub('^_+', ''):gsub('_+$', '')
+  return name
 end
 
 function M.setup(user_config)
+  load_config()
   config = vim.tbl_deep_extend("force", config, user_config or {})
   fn.mkdir(config.notes_dir, 'p')
+  save_config()
 end
 
 -- Find out where the notes are being saved
@@ -41,8 +61,19 @@ end
 function M.save_note(buf)
   buf = buf or api.nvim_get_current_buf()
   local lines = api.nvim_buf_get_lines(buf, 0, -1, false)
-  local filename = get_title_as_filename() .. ".md"
+
+  local first_line = lines[1] or ""
+  local filename = first_line:sub(1, 30)
+  filename = sanitize_filename(filename)
+
+  if filename == "" then
+    filename = os.date('%Y-%m-%d_%H_%M-%S')
+  end
+
+  filename = filename .. ".md"
+
   local filepath = fn.resolve(config.notes_dir .. '/' .. filename)
+
   fn.writefile(lines, filepath)
   print('Note saved: ' .. filepath)
 end
