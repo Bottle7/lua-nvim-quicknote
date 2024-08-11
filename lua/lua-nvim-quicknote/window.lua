@@ -13,6 +13,8 @@ local function create_float_win()
   local buf = note.create_note_buffer()
 
   local opts = {
+    title = "Quick Note",
+    title_pos = "center",
     relative = 'editor',
     width = width,
     height = height,
