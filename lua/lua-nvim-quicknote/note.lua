@@ -34,7 +34,7 @@ local function load_config()
 end
 
 local function sanitize_filename(name)
-  name = name.gsub('[^%w%s%-]', '_')
+  name = name:gsub('[^%w%s%-]', '_')
   name = name:gsub('%s', '_')
   name = name:gsub('^_+', ''):gsub('_+$', '')
   return name
