@@ -8,8 +8,8 @@ local note_buf = nil
 
 -- Create a floating window
 local function create_float_win()
-  local width = math.floor(vim.o.columns * 0.8)
-  local height = math.floor(vim.o.lines * 0.8)
+  local width = math.floor(vim.o.columns * 0.6)
+  local height = math.floor(vim.o.lines * 0.6)
   local buf = note.create_note_buffer()
 
   local opts = {
